@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+/* .heroui-toast-container {
+  position: fixed !important;
+  bottom: 1rem !important;
+  right: 1rem !important;
+  z-index: 9999 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+.heroui-toast-container > * {
+  pointer-events: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+} */
