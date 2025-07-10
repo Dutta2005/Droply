@@ -46,7 +46,7 @@ export default function Home() {
                   
                   <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-default-900 leading-tight">
                     Store your{" "}
-                    <span className="text-primary bg-gradient-to-r from-primary to-primary-600 bg-clip-text text-transparent">
+                    <span className="text-shadow-gray-400 bg-gradient-to-r from-gray-400 to-gray-600 bg-clip-text">
                       images
                     </span>{" "}
                     with ease

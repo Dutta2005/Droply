@@ -41,7 +41,7 @@ export default async function Dashboard() {
             <div className="p-2 rounded-full bg-gradient-to-r from-primary-100 to-secondary-100">
               <Sparkles className="h-6 w-6 text-primary-600" />
             </div>
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-gray-200">
               Welcome Back
             </h1>
           </div>

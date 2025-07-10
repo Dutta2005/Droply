@@ -46,7 +46,7 @@ export default function FileActions({
               className={`h-4 w-4 ${
                 file.isStarred
                   ? "text-yellow-400 fill-current"
-                  : "text-gray-400"
+                  : "text-gray-200"
               }`}
             />
           }
