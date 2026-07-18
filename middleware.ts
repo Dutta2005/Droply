@@ -4,7 +4,13 @@ import {
 } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)"]);
+const isPublicRoute = createRouteMatcher([
+  "/",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
+  "/share/(.*)", // Make share links publicly accessible
+  "/api/share/(.*)", // Make share API endpoints publicly accessible
+]);
 
 export default clerkMiddleware(async (auth, request) => {
   const user = auth();
