@@ -13,7 +13,6 @@ import {
 import { Divider } from "@heroui/divider";
 import { Tooltip } from "@heroui/tooltip";
 import { Card } from "@heroui/card";
-// import { addToast } from "@heroui/toast";
 import { formatDistanceToNow, format } from "date-fns";
 import type { File as FileType } from "@/lib/db/schema";
 import axios from "axios";
@@ -25,6 +24,7 @@ import FileLoadingState from "@/components/FileLoadingState";
 import FileTabs from "@/components/FileTabs";
 import FolderNavigation from "@/components/FolderNavigation";
 import FileActionButtons from "@/components/FileActionButtons";
+import ShareModal from "@/components/ShareModal";
 import { toast } from "react-toastify";
 
 interface FileListProps {
@@ -50,6 +50,7 @@ export default function FileList({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [emptyTrashModalOpen, setEmptyTrashModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<FileType | null>(null);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   // Fetch files
   const fetchFiles = async () => {
@@ -336,6 +337,12 @@ export default function FileList({
     }
   };
 
+  // Handle share action
+  const handleShareFile = (file: FileType) => {
+    setSelectedFile(file);
+    setShareModalOpen(true);
+  };
+
   if (loading) {
     return <FileLoadingState />;
   }
@@ -492,6 +499,7 @@ export default function FileList({
                           setDeleteModalOpen(true);
                         }}
                         onDownloadAction={handleDownloadFile}
+                        onShareAction={handleShareFile}
                       />
                     </TableCell>
                   </TableRow>
@@ -534,6 +542,17 @@ export default function FileList({
         onConfirm={handleEmptyTrash}
         isDangerous={true}
         warningMessage={`You are about to permanently delete all ${trashCount} items in your trash. These files will be permanently removed from your account and cannot be recovered.`}
+      />
+
+      {/* Share modal */}
+      <ShareModal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        file={selectedFile}
+        onShareSuccess={() => {
+          setShareModalOpen(false);
+          toast.success("Share link created!");
+        }}
       />
     </div>
   );
