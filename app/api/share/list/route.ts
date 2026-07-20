@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { shareLinks, files } from "@/lib/db/schema";
+import { share_links, files } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export async function GET(request: NextRequest) {
@@ -21,54 +21,54 @@ export async function GET(request: NextRequest) {
       // Get share links for a specific file
       shareLinksList = await db
         .select({
-          id: shareLinks.id,
-          fileId: shareLinks.fileId,
-          token: shareLinks.token,
-          permission: shareLinks.permission,
-          password: shareLinks.password,
-          expiresAt: shareLinks.expiresAt,
-          maxViews: shareLinks.maxViews,
-          viewCount: shareLinks.viewCount,
-          isActive: shareLinks.isActive,
-          createdAt: shareLinks.createdAt,
+          id: share_links.id,
+          fileId: share_links.fileId,
+          token: share_links.token,
+          permission: share_links.permission,
+          password: share_links.password,
+          expiresAt: share_links.expiresAt,
+          maxViews: share_links.maxViews,
+          viewCount: share_links.viewCount,
+          isActive: share_links.isActive,
+          createdAt: share_links.createdAt,
           fileName: files.name,
           fileType: files.type,
           isFolder: files.isFolder,
         })
-        .from(shareLinks)
-        .leftJoin(files, eq(shareLinks.fileId, files.id))
+        .from(share_links)
+        .leftJoin(files, eq(share_links.fileId, files.id))
         .where(and(
-          eq(shareLinks.createdBy, userId),
-          eq(shareLinks.fileId, fileId),
-          eq(shareLinks.isActive, true)
+          eq(share_links.createdBy, userId),
+          eq(share_links.fileId, fileId),
+          eq(share_links.isActive, true)
         ))
-        .orderBy(shareLinks.createdAt);
+        .orderBy(share_links.createdAt);
     } else {
       // Get all share links for all files owned by the user
       shareLinksList = await db
         .select({
-          id: shareLinks.id,
-          fileId: shareLinks.fileId,
-          token: shareLinks.token,
-          permission: shareLinks.permission,
-          password: shareLinks.password,
-          expiresAt: shareLinks.expiresAt,
-          maxViews: shareLinks.maxViews,
-          viewCount: shareLinks.viewCount,
-          isActive: shareLinks.isActive,
-          createdAt: shareLinks.createdAt,
+          id: share_links.id,
+          fileId: share_links.fileId,
+          token: share_links.token,
+          permission: share_links.permission,
+          password: share_links.password,
+          expiresAt: share_links.expiresAt,
+          maxViews: share_links.maxViews,
+          viewCount: share_links.viewCount,
+          isActive: share_links.isActive,
+          createdAt: share_links.createdAt,
           fileName: files.name,
           fileType: files.type,
           isFolder: files.isFolder,
         })
-        .from(shareLinks)
-        .leftJoin(files, eq(shareLinks.fileId, files.id))
+        .from(share_links)
+        .leftJoin(files, eq(share_links.fileId, files.id))
         .where(and(
-          eq(shareLinks.createdBy, userId),
+          eq(share_links.createdBy, userId),
           eq(files.userId, userId),
-          eq(shareLinks.isActive, true)
+          eq(share_links.isActive, true)
         ))
-        .orderBy(shareLinks.createdAt);
+        .orderBy(share_links.createdAt);
     }
 
     // Generate share URLs for each link

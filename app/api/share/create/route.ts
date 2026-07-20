@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { shareLinks, files } from "@/lib/db/schema";
+import { share_links, files } from "@/lib/db/schema";
 import { v4 as uuidv4 } from "uuid";
 import { eq, and } from "drizzle-orm";
 import { generateRandomToken, hashPassword } from "@/lib/utils";
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     };
 
     const [newShareLink] = await db
-      .insert(shareLinks)
+      .insert(share_links)
       .values(shareLinkData)
       .returning();
 

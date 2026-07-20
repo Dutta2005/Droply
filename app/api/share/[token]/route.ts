@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { shareLinks, files } from "@/lib/db/schema";
+import { share_links, files } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export async function GET(
@@ -13,8 +13,8 @@ export async function GET(
     // Find the share link
     const [shareLink] = await db
       .select()
-      .from(shareLinks)
-      .where(and(eq(shareLinks.token, token), eq(shareLinks.isActive, true)));
+      .from(share_links)
+      .where(and(eq(share_links.token, token), eq(share_links.isActive, true)));
 
     if (!shareLink) {
       return NextResponse.json(
@@ -62,9 +62,9 @@ export async function GET(
 
     // Increment view count
     await db
-      .update(shareLinks)
+      .update(share_links)
       .set({ viewCount: shareLink.viewCount + 1 })
-      .where(eq(shareLinks.id, shareLink.id));
+      .where(eq(share_links.id, shareLink.id));
 
     // Return file info with share link details
     return NextResponse.json({
@@ -110,8 +110,8 @@ export async function DELETE(
     // Find the share link
     const [shareLink] = await db
       .select()
-      .from(shareLinks)
-      .where(eq(shareLinks.token, token));
+      .from(share_links)
+      .where(eq(share_links.token, token));
 
     if (!shareLink) {
       return NextResponse.json(
@@ -135,9 +135,9 @@ export async function DELETE(
 
     // Deactivate the share link
     await db
-      .update(shareLinks)
+      .update(share_links)
       .set({ isActive: false })
-      .where(eq(shareLinks.id, shareLink.id));
+      .where(eq(share_links.id, shareLink.id));
 
     return NextResponse.json({
       success: true,

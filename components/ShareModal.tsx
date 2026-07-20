@@ -10,7 +10,8 @@ import {
 } from "@heroui/modal";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
-import { Link, Copy, Check, X, Share2 } from "lucide-react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import { Link, Copy, Check, X, Share2, MoreVertical } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import type { File as FileType } from "@/lib/db/schema";
@@ -106,17 +107,24 @@ export default function ShareModal({
   };
 
   const handleCreateShareLink = async () => {
-    if (!file) return;
+    if (!file) {
+      console.log('cant find file');
+      return
+    }
+
+    console.log('CLicking the share btn...')
 
     setLoading(true);
     try {
       const response = await axios.post("/api/share/create", {
         fileId: file.id,
         permission,
-        password: usePassword ? password : undefined,
-        expiresAt: useExpiration ? expiresAt : undefined,
-        maxViews: useMaxViews ? parseInt(maxViews) || undefined : undefined,
+        password: usePassword ? password : null,
+        expiresAt: useExpiration ? expiresAt : null,
+        maxViews: useMaxViews ? parseInt(maxViews) || null : null,
       });
+
+      console.log(response.data)
 
       const shareUrl = response.data?.shareLink?.shareUrl || "";
       setCreatedShareUrl(shareUrl);
@@ -257,17 +265,17 @@ export default function ShareModal({
                     key={link.id}
                     className="flex items-center justify-between p-3 border border-default-200 rounded-lg bg-default-50/80"
                   >
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0 pr-3">
                       <div className="flex items-center gap-2 mb-1">
-                        <Link className="h-4 w-4 text-default-500" />
-                        <span className="text-sm font-medium">
+                        <Link className="h-4 w-4 text-default-500 flex-shrink-0" />
+                        <span className="text-sm font-medium truncate">
                           {link.shareUrl
                             ?.replace(/^https?:\/\//, "")
                             .substring(0, 40)}
                           ...
                         </span>
                       </div>
-                      <div className="text-xs text-default-500">
+                      <div className="text-xs text-default-500 truncate">
                         Permission: {link.permission} | Views: {link.viewCount}/
                         {link.maxViews || "∞"} |
                         {link.expiresAt
@@ -275,7 +283,9 @@ export default function ShareModal({
                           : "No expiration"}
                       </div>
                     </div>
-                    <div className="flex gap-2">
+
+                    {/* Desktop Actions */}
+                    <div className="hidden sm:flex gap-2 flex-shrink-0">
                       <Button
                         size="sm"
                         variant="flat"
@@ -300,6 +310,35 @@ export default function ShareModal({
                       >
                         Revoke
                       </Button>
+                    </div>
+
+                    {/* Mobile Actions Dropdown */}
+                    <div className="sm:hidden flex-shrink-0">
+                      <Dropdown placement="bottom-end" classNames={{ content: "bg-black/70", base: "border border-default-200 bg-default-50 shadow-xl" }}>
+                        <DropdownTrigger>
+                          <Button isIconOnly size="sm" variant="light" className="text-default-500">
+                            <MoreVertical className="h-5 w-5" />
+                          </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu aria-label="Link actions" variant="flat">
+                          <DropdownItem
+                            key="copy"
+                            startContent={copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                            onPress={() => handleCopyLink(link.shareUrl || "")}
+                          >
+                            Copy Link
+                          </DropdownItem>
+                          <DropdownItem
+                            key="revoke"
+                            startContent={<X className="h-4 w-4" />}
+                            color="danger"
+                            className="text-danger"
+                            onPress={() => handleRevokeLink(link.token)}
+                          >
+                            Revoke Link
+                          </DropdownItem>
+                        </DropdownMenu>
+                      </Dropdown>
                     </div>
                   </div>
                 ))}

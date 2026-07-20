@@ -31,7 +31,7 @@ export const files = pgTable("files", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const shareLinks = pgTable("share_links", {
+export const share_links = pgTable("share_links", {
   id: uuid("id").defaultRandom().primaryKey(),
   
   // The file or folder being shared
@@ -65,9 +65,9 @@ export const shareLinks = pgTable("share_links", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const shareLinksRelations = relations(shareLinks, ({ one }) => ({
+export const shareLinksRelations = relations(share_links, ({ one }) => ({
   file: one(files, {
-    fields: [shareLinks.fileId],
+    fields: [share_links.fileId],
     references: [files.id],
   }),
 }));
@@ -80,10 +80,10 @@ export const filesRelations = relations(files, ({ one, many }) => ({
 
   children: many(files),
   
-  shareLinks: many(shareLinks),
+  share_links: many(share_links),
 }));
 
 export type File = typeof files.$inferSelect;
 export type NewFile = typeof files.$inferInsert;
-export type ShareLink = typeof shareLinks.$inferSelect;
-export type NewShareLink = typeof shareLinks.$inferInsert;
+export type ShareLink = typeof share_links.$inferSelect;
+export type NewShareLink = typeof share_links.$inferInsert;
