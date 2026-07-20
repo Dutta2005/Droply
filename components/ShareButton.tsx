@@ -11,7 +11,10 @@ interface ShareButtonProps {
   onShareSuccess?: () => void;
 }
 
-export default function ShareButton({ file, onShareSuccess }: ShareButtonProps) {
+export default function ShareButton({
+  file,
+  onShareSuccess,
+}: ShareButtonProps) {
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
   return (
@@ -24,13 +27,12 @@ export default function ShareButton({ file, onShareSuccess }: ShareButtonProps) 
       >
         Share
       </Button>
-      
+
       <ShareModal
         isOpen={shareModalOpen}
         onClose={() => setShareModalOpen(false)}
         file={file}
         onShareSuccess={() => {
-          setShareModalOpen(false);
           if (onShareSuccess) {
             onShareSuccess();
           }

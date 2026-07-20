@@ -106,8 +106,8 @@ export default function FileList({
       // Update local state
       setFiles(
         files.map((file) =>
-          file.id === fileId ? { ...file, isStarred: !file.isStarred } : file
-        )
+          file.id === fileId ? { ...file, isStarred: !file.isStarred } : file,
+        ),
       );
 
       // Show toast
@@ -115,7 +115,7 @@ export default function FileList({
       toast.success(
         file?.isStarred
           ? `${file?.name} has been starred`
-          : `${file?.name} has been unstarred`
+          : `${file?.name} has been unstarred`,
       );
     } catch (error) {
       console.error("Error starring file:", error);
@@ -131,8 +131,8 @@ export default function FileList({
       // Update local state
       setFiles(
         files.map((file) =>
-          file.id === fileId ? { ...file, isTrash: !file.isTrash } : file
-        )
+          file.id === fileId ? { ...file, isTrash: !file.isTrash } : file,
+        ),
       );
 
       // Show toast
@@ -171,9 +171,7 @@ export default function FileList({
       }
     } catch (error) {
       console.error("Error deleting file:", error);
-      toast.error(
-        `Failed to delete file. Please try again.`
-      );
+      toast.error(`Failed to delete file. Please try again.`);
     }
   };
 
@@ -468,10 +466,10 @@ export default function FileList({
                         {file.isFolder
                           ? "-"
                           : file.size < 1024
-                          ? `${file.size} B`
-                          : file.size < 1024 * 1024
-                          ? `${(file.size / 1024).toFixed(1)} KB`
-                          : `${(file.size / (1024 * 1024)).toFixed(1)} MB`}
+                            ? `${file.size} B`
+                            : file.size < 1024 * 1024
+                              ? `${(file.size / 1024).toFixed(1)} KB`
+                              : `${(file.size / (1024 * 1024)).toFixed(1)} MB`}
                       </div>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
@@ -549,10 +547,7 @@ export default function FileList({
         isOpen={shareModalOpen}
         onClose={() => setShareModalOpen(false)}
         file={selectedFile}
-        onShareSuccess={() => {
-          setShareModalOpen(false);
-          toast.success("Share link created!");
-        }}
+        onShareSuccess={() => {}}
       />
     </div>
   );

@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { shareLinks, files } from "@/lib/db/schema";
 import { v4 as uuidv4 } from "uuid";
 import { eq, and } from "drizzle-orm";
-import { generateRandomToken } from "@/lib/utils";
+import { generateRandomToken, hashPassword } from "@/lib/utils";
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,13 +59,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Hash password if provided
+    let hashedPassword: string | null = null;
+    if (password) {
+      hashedPassword = await hashPassword(password);
+    }
+
     // Create share link
     const shareLinkData = {
       id: uuidv4(),
       fileId,
       token,
       permission,
-      password: password || null,
+      password: hashedPassword,
       expiresAt: parsedExpiresAt || null,
       maxViews: maxViews || null,
       viewCount: 0,

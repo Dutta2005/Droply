@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@heroui/modal";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Link, Copy, Check, X, Share2 } from "lucide-react";
@@ -35,7 +41,12 @@ interface ShareLinkWithUrl {
   isFolder?: boolean;
 }
 
-export default function ShareModal({ isOpen, onClose, file, onShareSuccess }: ShareModalProps) {
+export default function ShareModal({
+  isOpen,
+  onClose,
+  file,
+  onShareSuccess,
+}: ShareModalProps) {
   const [permission, setPermission] = useState<"view" | "edit">("view");
   const [password, setPassword] = useState("");
   const [usePassword, setUsePassword] = useState(false);
@@ -44,32 +55,53 @@ export default function ShareModal({ isOpen, onClose, file, onShareSuccess }: Sh
   const [maxViews, setMaxViews] = useState("");
   const [useMaxViews, setUseMaxViews] = useState(false);
   const [shareLinks, setShareLinks] = useState<ShareLinkWithUrl[]>([]);
+  const [createdShareUrl, setCreatedShareUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fetchingLinks, setFetchingLinks] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Fetch existing share links for this file
+  // Fetch existing share links when modal opens
   useEffect(() => {
     if (file && isOpen) {
       fetchShareLinks();
     }
   }, [file, isOpen]);
 
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setCreatedShareUrl("");
+      setShareLinks([]);
+      setCopied(false);
+    }
+  }, [isOpen]);
+
   const fetchShareLinks = async () => {
     if (!file) return;
+    setFetchingLinks(true);
     try {
       const response = await axios.get(`/api/share/list?fileId=${file.id}`);
       const links = response.data.shareLinks || [];
       // Add shareUrl to each link
       const linksWithUrl = links.map((link: any) => ({
         ...link,
-        shareUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/share/${link.token}`,
+        shareUrl: link.shareUrl || `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/share/${link.token}`,
         fileName: file.name,
         fileType: file.type,
         isFolder: file.isFolder,
       }));
       setShareLinks(linksWithUrl);
+
+      // If there are existing links and no newly created URL, show the most recent one
+      if (linksWithUrl.length > 0) {
+        setCreatedShareUrl(
+          linksWithUrl[linksWithUrl.length - 1].shareUrl || "",
+        );
+      }
     } catch (error) {
       console.error("Error fetching share links:", error);
+    } finally {
+      setFetchingLinks(false);
     }
   };
 
@@ -86,10 +118,16 @@ export default function ShareModal({ isOpen, onClose, file, onShareSuccess }: Sh
         maxViews: useMaxViews ? parseInt(maxViews) || undefined : undefined,
       });
 
+      const shareUrl = response.data?.shareLink?.shareUrl || "";
+      setCreatedShareUrl(shareUrl);
+      if (shareUrl) {
+        await navigator.clipboard.writeText(shareUrl);
+      }
+
       toast.success("Share link created successfully!");
       onShareSuccess();
       fetchShareLinks();
-      
+
       // Reset form
       setPermission("view");
       setPassword("");
@@ -139,7 +177,16 @@ export default function ShareModal({ isOpen, onClose, file, onShareSuccess }: Sh
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="lg"
+      backdrop="blur"
+      classNames={{
+        base: "border border-default-200 bg-default-50 shadow-xl",
+        backdrop: "bg-black/70",
+      }}
+    >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
@@ -147,15 +194,63 @@ export default function ShareModal({ isOpen, onClose, file, onShareSuccess }: Sh
             <h2 className="text-xl font-semibold">Share {file?.name}</h2>
           </div>
           <p className="text-sm text-default-500">
-            Create a shareable link that others can use to access this {file?.isFolder ? "folder" : "file"}
+            Create a shareable link that others can use to access this{" "}
+            {file?.isFolder ? "folder" : "file"}
           </p>
         </ModalHeader>
 
         <ModalBody>
+          {fetchingLinks && !createdShareUrl && (
+            <div className="mb-4 flex items-center justify-center gap-2 py-3 text-sm text-default-500">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              Loading existing share links...
+            </div>
+          )}
+
+          {createdShareUrl && (
+            <div className="mb-6 rounded-lg border border-primary-200 bg-primary-50 p-4">
+              <div className="mb-2 flex items-center gap-2">
+                <Link className="h-4 w-4 text-primary" />
+                <h3 className="text-sm font-medium text-default-800">
+                  {shareLinks.length > 0 ? "Your share link" : "Your share link"}
+                </h3>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Input
+                  value={createdShareUrl}
+                  readOnly
+                  size="sm"
+                  className="flex-1"
+                  aria-label="Created share link"
+                />
+                <Button
+                  size="sm"
+                  variant="flat"
+                  color="primary"
+                  onClick={() => handleCopyLink(createdShareUrl)}
+                  startContent={
+                    copied ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )
+                  }
+                >
+                  Copy Link
+                </Button>
+              </div>
+              <p className="mt-2 text-xs text-default-500">
+                Click &quot;Copy Link&quot; to copy this share link to your clipboard.
+              </p>
+            </div>
+          )}
+
           {/* Existing Share Links */}
           {shareLinks.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-sm font-medium text-default-700 mb-3">Existing Share Links</h3>
+              <h3 className="text-sm font-medium text-default-700 mb-3">
+                Existing Share Links
+              </h3>
               <div className="space-y-3">
                 {shareLinks.map((link) => (
                   <div
@@ -166,21 +261,32 @@ export default function ShareModal({ isOpen, onClose, file, onShareSuccess }: Sh
                       <div className="flex items-center gap-2 mb-1">
                         <Link className="h-4 w-4 text-default-500" />
                         <span className="text-sm font-medium">
-                          {link.shareUrl?.replace(/^https?:\/\//, '').substring(0, 40)}...
+                          {link.shareUrl
+                            ?.replace(/^https?:\/\//, "")
+                            .substring(0, 40)}
+                          ...
                         </span>
                       </div>
                       <div className="text-xs text-default-500">
-                        Permission: {link.permission} | 
-                        Views: {link.viewCount}/{link.maxViews || "∞"} | 
-                        {link.expiresAt ? `Expires: ${new Date(link.expiresAt).toLocaleDateString()}` : "No expiration"}
+                        Permission: {link.permission} | Views: {link.viewCount}/
+                        {link.maxViews || "∞"} |
+                        {link.expiresAt
+                          ? `Expires: ${new Date(link.expiresAt).toLocaleDateString()}`
+                          : "No expiration"}
                       </div>
                     </div>
                     <div className="flex gap-2">
                       <Button
                         size="sm"
                         variant="flat"
-                        onClick={() => handleCopyLink(link.shareUrl || '')}
-                        startContent={copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                        onClick={() => handleCopyLink(link.shareUrl || "")}
+                        startContent={
+                          copied ? (
+                            <Check className="h-4 w-4" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )
+                        }
                       >
                         Copy
                       </Button>
@@ -202,8 +308,10 @@ export default function ShareModal({ isOpen, onClose, file, onShareSuccess }: Sh
 
           {/* Create New Share Link */}
           <div>
-            <h3 className="text-sm font-medium text-default-700 mb-3">Create New Share Link</h3>
-            
+            <h3 className="text-sm font-medium text-default-700 mb-3">
+              Create New Share Link
+            </h3>
+
             <div className="space-y-4">
               {/* Permission */}
               <div>
@@ -231,7 +339,9 @@ export default function ShareModal({ isOpen, onClose, file, onShareSuccess }: Sh
                   </Button>
                 </div>
                 <p className="text-xs text-default-500 mt-1">
-                  {permission === "view" ? "Others can only view the file" : "Others can upload and modify (if folder)"}
+                  {permission === "view"
+                    ? "Others can only view the file"
+                    : "Others can upload and modify (if folder)"}
                 </p>
               </div>
 

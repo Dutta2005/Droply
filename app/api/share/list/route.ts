@@ -39,7 +39,8 @@ export async function GET(request: NextRequest) {
         .leftJoin(files, eq(shareLinks.fileId, files.id))
         .where(and(
           eq(shareLinks.createdBy, userId),
-          eq(shareLinks.fileId, fileId)
+          eq(shareLinks.fileId, fileId),
+          eq(shareLinks.isActive, true)
         ))
         .orderBy(shareLinks.createdAt);
     } else {
@@ -64,7 +65,8 @@ export async function GET(request: NextRequest) {
         .leftJoin(files, eq(shareLinks.fileId, files.id))
         .where(and(
           eq(shareLinks.createdBy, userId),
-          eq(files.userId, userId)
+          eq(files.userId, userId),
+          eq(shareLinks.isActive, true)
         ))
         .orderBy(shareLinks.createdAt);
     }
