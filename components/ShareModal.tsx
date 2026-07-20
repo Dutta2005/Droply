@@ -191,7 +191,7 @@ export default function ShareModal({
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <Share2 className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-semibold">Share {file?.name}</h2>
+            <h2 className="text-xl font-semibold text-default-900">Share {file?.name}</h2>
           </div>
           <p className="text-sm text-default-500">
             Create a shareable link that others can use to access this{" "}
@@ -255,7 +255,7 @@ export default function ShareModal({
                 {shareLinks.map((link) => (
                   <div
                     key={link.id}
-                    className="flex items-center justify-between p-3 border border-default-200 rounded-lg"
+                    className="flex items-center justify-between p-3 border border-default-200 rounded-lg bg-default-50/80"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
@@ -296,6 +296,7 @@ export default function ShareModal({
                         color="danger"
                         onClick={() => handleRevokeLink(link.token)}
                         startContent={<X className="h-4 w-4" />}
+                        className="bg-danger-50"
                       >
                         Revoke
                       </Button>
@@ -346,7 +347,7 @@ export default function ShareModal({
               </div>
 
               {/* Password Protection */}
-              <div className="border border-default-200 rounded-lg p-4">
+              <div className="border border-default-200 rounded-lg p-4 bg-default-50/50">
                 <div className="flex items-center justify-between mb-3">
                   <label className="text-sm font-medium text-default-700">
                     Password Protection
@@ -373,7 +374,7 @@ export default function ShareModal({
               </div>
 
               {/* Expiration */}
-              <div className="border border-default-200 rounded-lg p-4">
+              <div className="border border-default-200 rounded-lg p-4 bg-default-50/50">
                 <div className="flex items-center justify-between mb-3">
                   <label className="text-sm font-medium text-default-700">
                     Set Expiration Date
@@ -399,7 +400,7 @@ export default function ShareModal({
               </div>
 
               {/* Max Views */}
-              <div className="border border-default-200 rounded-lg p-4">
+              <div className="border border-default-200 rounded-lg p-4 bg-default-50/50">
                 <div className="flex items-center justify-between mb-3">
                   <label className="text-sm font-medium text-default-700">
                     Limit Number of Views
@@ -429,7 +430,7 @@ export default function ShareModal({
           </div>
         </ModalBody>
 
-        <ModalFooter>
+        <ModalFooter className="pt-4 border-t border-default-200">
           <Button variant="light" onClick={onClose}>
             Cancel
           </Button>
